@@ -21,6 +21,10 @@ connectDB()
 
 const app = express()
 
+//body parser
+app.use(express.urlencoded({ extended: false }))
+app.use(express.json()) 
+
 //logging
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'))
@@ -28,6 +32,32 @@ if (process.env.NODE_ENV === 'development') {
 
 //Handlebars
 app.engine('.hbs', exphbs({defaultLayout: 'main', extname: '.hbs'}))
+app.set('view engine', '.hbs')
+
+// Handlebars Helpers
+const {
+  formatDate,
+  stripTags,
+  truncate,
+  editIcon,
+  select,
+} = require('./helpers/hbs')
+
+// Handlebars
+app.engine(
+  '.hbs',
+  exphbs({
+    helpers: {
+      formatDate,
+      stripTags,
+      truncate,
+      editIcon,
+      select,
+    },
+    defaultLayout: 'main',
+    extname: '.hbs',
+  })
+)
 app.set('view engine', '.hbs')
 
 //sessions
@@ -48,9 +78,10 @@ app.use(express.static(path.join(__dirname, 'public')))
 //routes
 app.use('/', require('./routes/index'))
 app.use('/auth', require('./routes/auth'))
+app.use('/notes', require('./routes/notes'))
 
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 3000
 
 app.listen(
     PORT,
